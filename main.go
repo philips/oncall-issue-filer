@@ -14,7 +14,7 @@
 
 package main
 
-import "github.com/philips/opsgenie-github-issue-filer/cmd"
+import "github.com/philips/oncall-issue-filer/cmd"
 
 func main() {
 	cmd.Execute()
