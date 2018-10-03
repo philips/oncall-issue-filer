@@ -131,12 +131,21 @@ func ogMain() {
 	ogc.cli = cli
 
 	fmt.Printf("config: %v\n", viper.AllSettings())
-	urls, err := ghc.findIssuesWithString(TestUUID)
+
+	list, err := ogc.findAlerts()
 	if err != nil {
 		panic(err)
 	}
+	for _, alert := range list {
+		urls, err := ghc.findIssuesWithString(alert.ID)
+		if err != nil {
+			panic(err)
+		}
+		if len(urls) > 0 {
+			fmt.Printf("issue filed for alert %s at %s\n", alert.ID, urls[0])
+			continue
+		}
 
-	fmt.Printf("%v\n", urls)
-	list, err := ogc.findAlerts()
-	fmt.Printf("%v\n", list)
+		fmt.Printf("TODO: file issue for %v\n", alert.ID)
+	}
 }
