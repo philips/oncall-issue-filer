@@ -15,19 +15,47 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"os"
+	"strings"
 
+	"github.com/google/go-github/v18/github"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
+var ghc GitHub
+
+// TODO: put into new package
 type GitHub struct {
 	APIKey string
 	Repo   string
 }
 
-var ghc GitHub
+// findIssues finds issues that contain the given OpsGenie Alert ID and returns
+// a list of issue URLs. NOTE: we actually don't care about the URLs and only
+// request the first result.
+func (g GitHub) findIssuesWithString(id string) ([]string, error) {
+	client := github.NewClient(nil)
+
+	query := fmt.Sprintf("is:open repo:%s %s", g.Repo, id)
+	println(query)
+	opts := &github.SearchOptions{
+		Sort:        "date",
+		Order:       "desc",
+		ListOptions: github.ListOptions{Page: 1, PerPage: 1},
+	}
+	result, _, err := client.Search.Issues(context.Background(), query, opts)
+	if err != nil {
+		return nil, err
+	}
+	for _, issue := range result.Issues {
+		return []string{*issue.URL}, nil
+	}
+
+	return nil, nil
+}
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -51,17 +79,22 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
-	opsgenieCmd.PersistentFlags().StringVar(&ghc.APIKey, "github-api-key", "", "API key for GitHub")
+	rootCmd.PersistentFlags().String("github-api-key", "", "API key for GitHub")
 	viper.BindPFlag("github-api-key", rootCmd.PersistentFlags().Lookup("github-api-key"))
 
-	opsgenieCmd.PersistentFlags().StringVar(&ghc.Repo, "github-repo", "", "target GitHub Repo for filing")
-	viper.BindPFlag("github-repo", rootCmd.PersistentFlags().Lookup("github-api-key"))
+	rootCmd.PersistentFlags().String("github-repo", "", "target GitHub Repo for filing")
+	viper.BindPFlag("github-repo", rootCmd.PersistentFlags().Lookup("github-repo"))
 
+	cobra.OnInitialize(initConfig)
 }
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	viper.SetEnvPrefix("on_call_filer")
+	viper.SetEnvPrefix("oncall_issue_filer")
+	replacer := strings.NewReplacer("-", "_")
+	viper.SetEnvKeyReplacer(replacer)
 	viper.AutomaticEnv()
+
+	ghc.Repo = viper.Get("github-repo").(string)
+	ghc.APIKey = viper.Get("github-api-key").(string)
 }

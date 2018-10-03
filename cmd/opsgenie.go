@@ -15,11 +15,9 @@
 package cmd
 
 import (
-	"context"
 	"fmt"
 	"strings"
 
-	"github.com/google/go-github/v18/github"
 	"github.com/opsgenie/opsgenie-go-sdk/alertsv2"
 	ogcli "github.com/opsgenie/opsgenie-go-sdk/client"
 	"github.com/opsgenie/opsgenie-go-sdk/userv2"
@@ -31,8 +29,6 @@ type OpsGenie struct {
 	APIKey string
 }
 
-var ogc OpsGenie
-
 // opsgenieCmd represents the opsgenie command
 var opsgenieCmd = &cobra.Command{
 	Use:   "opsgenie",
@@ -41,15 +37,15 @@ var opsgenieCmd = &cobra.Command{
 issues against all acknowledged alerts. Uses the AlertID as the deduplication
 key.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		ogMain(ogc)
+		ogMain()
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(opsgenieCmd)
 
-	opsgenieCmd.PersistentFlags().StringVar(&ogc.APIKey, "api-key", "", "API key for OpsGenie")
-	viper.BindPFlag("api-key", rootCmd.PersistentFlags().Lookup("api-key"))
+	opsgenieCmd.PersistentFlags().String("opsgenie-api-key", "", "API key for OpsGenie")
+	viper.BindPFlag("opsgenie-api-key", opsgenieCmd.PersistentFlags().Lookup("opsgenie-api-key"))
 }
 
 const (
@@ -89,6 +85,7 @@ func getGitHubUsername(userCli *ogcli.OpsGenieUserV2Client, ogUsername string) (
 }
 
 func opsGenie(apiKey string) (AlertIssues, error) {
+	var list AlertIssues
 	cli := new(ogcli.OpsGenieClient)
 	cli.SetAPIKey(apiKey)
 
@@ -131,31 +128,13 @@ func opsGenie(apiKey string) (AlertIssues, error) {
 	return nil, nil
 }
 
-// findIssues finds issues that contain the given OpsGenie Alert ID and returns
-// a list of issue URLs. NOTE: we actually don't care about the URLs and only
-// request the first result.
-func findIssues(id string) ([]string, error) {
-	client := github.NewClient(nil)
+func ogMain() {
+	var ogc OpsGenie
 
-	query := fmt.Sprintf("is:open repo:%s %s", Repo, id)
-	opts := &github.SearchOptions{
-		Sort:        "date",
-		Order:       "desc",
-		ListOptions: github.ListOptions{Page: 1, PerPage: 1},
-	}
-	result, _, err := client.Search.Issues(context.Background(), query, opts)
-	if err != nil {
-		return nil, err
-	}
-	for _, issue := range result.Issues {
-		return []string{*issue.URL}, nil
-	}
+	ogc.APIKey = viper.Get("opsgenie-api-key").(string)
 
-	return nil, nil
-}
-
-func ogMain(ogc OpsGenie) {
-	urls, err := findIssues(TestUUID)
+	fmt.Printf("config: %v\n", viper.AllSettings())
+	urls, err := ghc.findIssuesWithString(TestUUID)
 	if err != nil {
 		panic(err)
 	}
