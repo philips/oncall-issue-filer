@@ -25,10 +25,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-type OpsGenie struct {
-	APIKey string
-}
-
 // opsgenieCmd represents the opsgenie command
 var opsgenieCmd = &cobra.Command{
 	Use:   "opsgenie",
@@ -62,7 +58,13 @@ type AlertIssue struct {
 
 type AlertIssues []AlertIssue
 
-func getGitHubUsername(userCli *ogcli.OpsGenieUserV2Client, ogUsername string) (string, error) {
+type OpsGenie struct {
+	cli *ogcli.OpsGenieClient
+}
+
+func (o OpsGenie) getGitHubUsername(ogUsername string) (string, error) {
+	userCli, _ := o.cli.UserV2()
+
 	req := userv2.GetUserRequest{
 		Identifier: &userv2.Identifier{
 			Username: ogUsername,
@@ -84,13 +86,10 @@ func getGitHubUsername(userCli *ogcli.OpsGenieUserV2Client, ogUsername string) (
 	return username, nil
 }
 
-func opsGenie(apiKey string) (AlertIssues, error) {
+func (o OpsGenie) findAlerts() (AlertIssues, error) {
 	var list AlertIssues
-	cli := new(ogcli.OpsGenieClient)
-	cli.SetAPIKey(apiKey)
 
-	alertCli, _ := cli.AlertV2()
-	userCli, _ := cli.UserV2()
+	alertCli, _ := o.cli.AlertV2()
 
 	response, err := alertCli.List(alertsv2.ListAlertRequest{
 		Limit:                MaxOutstandingIssues,
@@ -103,35 +102,33 @@ func opsGenie(apiKey string) (AlertIssues, error) {
 		return nil, err
 	}
 
-	for i, alert := range response.Alerts {
-		fmt.Printf("%v(%v): %v\n", i, alert.Acknowledged, alert.Message)
+	for _, alert := range response.Alerts {
 		response, err := alertCli.Get(alertsv2.GetAlertRequest{
 			Identifier: &alertsv2.Identifier{ID: alert.ID},
 		})
 		if err != nil {
 			return nil, err
 		}
-		if alert.Acknowledged {
-			handle, err := getGitHubUsername(userCli, response.Alert.Report.AcknowledgedBy)
-			if err != nil {
-				return nil, err
-			}
-			list = append(list, AlertIssue{
-				ID:             alert.ID,
-				AcknowledgedBy: handle,
-				Description:    response.Alert.Description,
-				Subject:        alert.Message,
-			})
+		handle, err := o.getGitHubUsername(response.Alert.Report.AcknowledgedBy)
+		if err != nil {
+			return nil, err
 		}
+		list = append(list, AlertIssue{
+			ID:             alert.ID,
+			AcknowledgedBy: handle,
+			Description:    response.Alert.Description,
+			Subject:        alert.Message,
+		})
 	}
 
-	return nil, nil
+	return list, nil
 }
 
 func ogMain() {
 	var ogc OpsGenie
-
-	ogc.APIKey = viper.Get("opsgenie-api-key").(string)
+	cli := new(ogcli.OpsGenieClient)
+	cli.SetAPIKey(viper.Get("opsgenie-api-key").(string))
+	ogc.cli = cli
 
 	fmt.Printf("config: %v\n", viper.AllSettings())
 	urls, err := ghc.findIssuesWithString(TestUUID)
@@ -140,5 +137,6 @@ func ogMain() {
 	}
 
 	fmt.Printf("%v\n", urls)
-	opsGenie(ogc.APIKey)
+	list, err := ogc.findAlerts()
+	fmt.Printf("%v\n", list)
 }
