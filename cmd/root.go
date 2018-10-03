@@ -17,19 +17,21 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
 
 	"github.com/google/go-github/v18/github"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"golang.org/x/oauth2"
 )
 
 var ghc GitHub
 
 // TODO: put into new package
 type GitHub struct {
-	APIKey string
+	Client *github.Client
 	Repo   string
 }
 
@@ -37,16 +39,13 @@ type GitHub struct {
 // a list of issue URLs. NOTE: we actually don't care about the URLs and only
 // request the first result.
 func (g GitHub) findIssuesWithString(id string) ([]string, error) {
-	client := github.NewClient(nil)
-
 	query := fmt.Sprintf("is:open repo:%s %s", g.Repo, id)
-	println(query)
 	opts := &github.SearchOptions{
 		Sort:        "date",
 		Order:       "desc",
 		ListOptions: github.ListOptions{Page: 1, PerPage: 1},
 	}
-	result, _, err := client.Search.Issues(context.Background(), query, opts)
+	result, _, err := g.Client.Search.Issues(context.Background(), query, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +87,6 @@ func init() {
 	cobra.OnInitialize(initConfig)
 }
 
-// initConfig reads in config file and ENV variables if set.
 func initConfig() {
 	viper.SetEnvPrefix("oncall_issue_filer")
 	replacer := strings.NewReplacer("-", "_")
@@ -96,5 +94,17 @@ func initConfig() {
 	viper.AutomaticEnv()
 
 	ghc.Repo = viper.Get("github-repo").(string)
-	ghc.APIKey = viper.Get("github-api-key").(string)
+	apiKey := viper.Get("github-api-key").(string)
+	var tc *http.Client
+	if apiKey != "" {
+		ctx := context.Background()
+		ts := oauth2.StaticTokenSource(
+			&oauth2.Token{AccessToken: viper.Get("github-api-key").(string)},
+		)
+		tc = oauth2.NewClient(ctx, ts)
+	} else {
+		fmt.Printf("INFO: github-api-key unset, using anonymous API auth\n")
+	}
+
+	ghc.Client = github.NewClient(tc)
 }

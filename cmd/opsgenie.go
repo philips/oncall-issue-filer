@@ -62,7 +62,7 @@ type OpsGenie struct {
 	cli *ogcli.OpsGenieClient
 }
 
-func (o OpsGenie) getGitHubUsername(ogUsername string) (string, error) {
+func (o OpsGenie) gitHubUsername(ogUsername string) (string, error) {
 	userCli, _ := o.cli.UserV2()
 
 	req := userv2.GetUserRequest{
@@ -74,7 +74,7 @@ func (o OpsGenie) getGitHubUsername(ogUsername string) (string, error) {
 	var username string
 	resp, err := userCli.Get(req)
 	if err != nil {
-		return username, err
+		return "", err
 	}
 
 	for _, t := range resp.User.Tags {
@@ -86,7 +86,7 @@ func (o OpsGenie) getGitHubUsername(ogUsername string) (string, error) {
 	return username, nil
 }
 
-func (o OpsGenie) findAlerts() (AlertIssues, error) {
+func (o OpsGenie) acknowledgedAlerts() (AlertIssues, error) {
 	var list AlertIssues
 
 	alertCli, _ := o.cli.AlertV2()
@@ -109,7 +109,7 @@ func (o OpsGenie) findAlerts() (AlertIssues, error) {
 		if err != nil {
 			return nil, err
 		}
-		handle, err := o.getGitHubUsername(response.Alert.Report.AcknowledgedBy)
+		handle, err := o.gitHubUsername(response.Alert.Report.AcknowledgedBy)
 		if err != nil {
 			return nil, err
 		}
@@ -125,17 +125,21 @@ func (o OpsGenie) findAlerts() (AlertIssues, error) {
 }
 
 func ogMain() {
+	apiKey := viper.Get("opsgenie-api-key").(string)
+	if apiKey == "" {
+		fmt.Printf("ERROR: opsgenie-api-key is unset\n")
+	}
+
 	var ogc OpsGenie
 	cli := new(ogcli.OpsGenieClient)
-	cli.SetAPIKey(viper.Get("opsgenie-api-key").(string))
+	cli.SetAPIKey(apiKey)
 	ogc.cli = cli
 
-	fmt.Printf("config: %v\n", viper.AllSettings())
-
-	list, err := ogc.findAlerts()
+	list, err := ogc.acknowledgedAlerts()
 	if err != nil {
 		panic(err)
 	}
+
 	for _, alert := range list {
 		urls, err := ghc.findIssuesWithString(alert.ID)
 		if err != nil {
