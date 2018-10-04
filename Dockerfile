@@ -10,4 +10,4 @@ FROM gcr.io/distroless/base:latest
 
 COPY --from=builder /usr/local/bin/oncall-issue-filer /usr/local/bin/oncall-issue-filer
 
-CMD ["/usr/local/bin/oncall-issue-filer"]
+ENTRYPOINT ["/usr/local/bin/oncall-issue-filer"]

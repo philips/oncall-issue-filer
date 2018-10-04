@@ -17,7 +17,9 @@ spec:
       containers:
       - name: envars-test-container
         image: quay.io/philips/oncall-issue-filer
+        command: ["/usr/local/bin/oncall-issue-filer"]
         args: ["opsgenie"]
+        imagePullPolicy: Always
         env:
         - name: ONCALL_ISSUE_FILER_GITHUB_API_KEY
           valueFrom:
