@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: secret-envars-test-pod
+spec:
+  containers:
+  - name: envars-test-container
+    image: quay.io/philips/oncall-issue-filer
+    env:
+    - name: ONCALL_ISSUE_FILER_GITHUB_API_KEY
+      valueFrom:
+        secretKeyRef:
+          name: oncall-issue-filer
+          key: github-api-key
+    - ONCALL_ISSUE_FILER_GITHUB_REPO
+      valueFrom:
+        secretKeyRef:
+          name: oncall-issue-filer
+          key: github-repo
+    - name: ONCALL_ISSUE_FILER_OPSGENIE_API_KEY
+      valueFrom:
+        secretKeyRef:
+          name: oncall-issue-filer
+          key: opsgenie-api-key
+
