@@ -1,0 +1,38 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: oncall-issue-filer
+  labels:
+    app: oncall-issue-filer
+spec:
+  schedule: "*/1 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: oncall-issue-filer
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: envars-test-container
+            image: quay.io/philips/oncall-issue-filer
+            command: ["/usr/local/bin/oncall-issue-filer"]
+            args: ["opsgenie"]
+            imagePullPolicy: Always
+            env:
+            - name: ONCALL_ISSUE_FILER_GITHUB_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: oncall-issue-filer
+                  key: github-api-key
+            - name: ONCALL_ISSUE_FILER_GITHUB_REPO
+              valueFrom:
+                secretKeyRef:
+                  name: oncall-issue-filer
+                  key: github-repo
+            - name: ONCALL_ISSUE_FILER_OPSGENIE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: oncall-issue-filer
+                  key: opsgenie-api-key
