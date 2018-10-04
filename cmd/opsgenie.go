@@ -142,24 +142,22 @@ func ogMain() {
 		panic(err)
 	}
 
-	for {
-		for _, alert := range list {
-			urls, err := ghc.findIssuesWithString(alert.ID)
-			if err != nil {
-				panic(err)
-			}
-			if len(urls) > 0 {
-				fmt.Printf("INFO: alert %s has existing issue %s\n", alert.ID, urls[0])
-				continue
-			}
-
-			fmt.Printf("INFO: filing issue for %v\n", alert.ID)
-			issue, _, err := ghc.fileIssueFromAlert(alert)
-			if err != nil {
-				panic(err)
-			}
-
-			fmt.Printf("INFO: filed issue for %v at %s\n", alert.ID, *issue.URL)
+	for _, alert := range list {
+		urls, err := ghc.findIssuesWithString(alert.ID)
+		if err != nil {
+			panic(err)
 		}
+		if len(urls) > 0 {
+			fmt.Printf("INFO: alert %s has existing issue %s\n", alert.ID, urls[0])
+			continue
+		}
+
+		fmt.Printf("INFO: filing issue for %v\n", alert.ID)
+		issue, _, err := ghc.fileIssueFromAlert(alert)
+		if err != nil {
+			panic(err)
+		}
+
+		fmt.Printf("INFO: filed issue for %v at %s\n", alert.ID, *issue.URL)
 	}
 }
