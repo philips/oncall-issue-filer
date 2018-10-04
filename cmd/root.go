@@ -63,7 +63,9 @@ func (g GitHub) fileIssueFromAlert(alert AlertIssue) (*github.Issue, *github.Res
 		alert.ID,
 		alert.AcknowledgedBy)
 
-	return g.Client.Issues.Create(ctx, alert.AcknowledgedBy, g.Repo, &github.IssueRequest{
+	repo := strings.Split(g.Repo, "/")
+
+	return g.Client.Issues.Create(ctx, repo[0], repo[1], &github.IssueRequest{
 		Title:     &alert.Subject,
 		Body:      &body,
 		Assignees: &alert.Assignees,
