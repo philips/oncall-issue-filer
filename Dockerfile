@@ -1,4 +1,4 @@
-FROM gcr.io/gcp-runtimes/go1-builder:1.11 as builder
+FROM golang:1.11 as builder
 
 WORKDIR /go/src/github.com/philips/oncall-issue-filer
 COPY . .
