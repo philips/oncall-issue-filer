@@ -1,4 +1,4 @@
-// Copyright © 2018 NAME HERE <EMAIL ADDRESS>
+// Copyright © 2018 Brandon Philips <brandon@ifup.org>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -148,7 +148,7 @@ func ogMain() {
 			panic(err)
 		}
 		if len(urls) > 0 {
-			fmt.Printf("issue filed for alert %s at %s\n", alert.ID, urls[0])
+			fmt.Printf("INFO: alert %s has existing issue %s\n", alert.ID, urls[0])
 			continue
 		}
 
@@ -158,6 +158,6 @@ func ogMain() {
 			panic(err)
 		}
 
-		fmt.Printf("INFO: filed issue for %v at %v\n", alert.ID, issue.URL)
+		fmt.Printf("INFO: filed issue for %v at %s\n", alert.ID, *issue.URL)
 	}
 }
