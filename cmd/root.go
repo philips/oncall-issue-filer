@@ -56,6 +56,20 @@ func (g GitHub) findIssuesWithString(id string) ([]string, error) {
 	return nil, nil
 }
 
+func (g GitHub) fileIssueFromAlert(alert AlertIssue) (*github.Issue, *github.Response, error) {
+	ctx := context.Background()
+	body := fmt.Sprintf("%v\n\nAlert ID: %v\nAcknowledgedBy: %v\n",
+		alert.Description,
+		alert.ID,
+		alert.AcknowledgedBy)
+
+	return g.Client.Issues.Create(ctx, alert.AcknowledgedBy, g.Repo, &github.IssueRequest{
+		Title:     &alert.Subject,
+		Body:      &body,
+		Assignees: &alert.Assignees,
+	})
+}
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "oncall-issue-filer",

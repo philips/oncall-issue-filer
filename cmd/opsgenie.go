@@ -51,6 +51,7 @@ const (
 
 type AlertIssue struct {
 	ID             string
+	Assignees      []string
 	AcknowledgedBy string
 	Description    string
 	Subject        string
@@ -115,7 +116,8 @@ func (o OpsGenie) acknowledgedAlerts() (AlertIssues, error) {
 		}
 		list = append(list, AlertIssue{
 			ID:             alert.ID,
-			AcknowledgedBy: handle,
+			Assignees:      []string{handle},
+			AcknowledgedBy: response.Alert.Report.AcknowledgedBy,
 			Description:    response.Alert.Description,
 			Subject:        alert.Message,
 		})
@@ -150,6 +152,12 @@ func ogMain() {
 			continue
 		}
 
-		fmt.Printf("TODO: file issue for %v\n", alert.ID)
+		fmt.Printf("INFO: filing issue for %v\n", alert.ID)
+		issue, _, err := ghc.fileIssueFromAlert(alert)
+		if err != nil {
+			panic(err)
+		}
+
+		fmt.Printf("INFO: filed issue for %v at %v\n", alert.ID, issue.URL)
 	}
 }
