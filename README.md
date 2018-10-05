@@ -38,6 +38,28 @@ export GO111MODULE=on
 go run main.go
 ```
 
+## OpsGenie Configuration
+
+### User Tag Configuration
+
+Every user must add a `github=GITHUB_USERNAME` tag to their OpsGenie profile for the tool to work.
+
+![User Configuration](/docs/opsgenie/user-tag.png)
+
+### Alert Configuration
+
+**Ignore Replies**
+
+Add Ignore Filter for `(?:(?i)re: |fwd: )?(.*)`.
+
+![Ignore Filter Configuration](/docs/opsgenie/ignore-filter.png)
+
+**Alert Fields**
+
+Configure as shown below.
+
+![Alert Fields Configuration](/docs/opsgenie/alert-fields.png)
+
 ## TODO
 
 - Refactor into cleaner packages
