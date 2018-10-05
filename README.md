@@ -1,5 +1,7 @@
 # On-Call Issue Filer
 
+[![Docker Repository on Quay](https://quay.io/repository/philips/oncall-issue-filer/status "Docker Repository on Quay")](https://quay.io/repository/philips/oncall-issue-filer)
+
 File issues on GitHub based on acknowledged alerts.
 
 On-call rotations where an incident requires multiple stakeholders coming
@@ -35,3 +37,8 @@ git clone https://github.com/philips/oncall-issue-filer
 export GO111MODULE=on
 go run main.go
 ```
+
+## TODO
+
+- Refactor into cleaner packages
+- Introduce dry-run via refactor
