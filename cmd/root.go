@@ -39,7 +39,7 @@ type GitHub struct {
 // a list of issue URLs. NOTE: we actually don't care about the URLs and only
 // request the first result.
 func (g GitHub) findIssuesWithString(id string) ([]string, error) {
-	query := fmt.Sprintf("is:open repo:%s %s", g.Repo, id)
+	query := fmt.Sprintf("repo:%s %s", g.Repo, id)
 	opts := &github.SearchOptions{
 		Sort:        "date",
 		Order:       "desc",
