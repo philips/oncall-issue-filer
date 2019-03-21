@@ -6,7 +6,7 @@ require (
 	github.com/google/go-github/v18 v18.2.0
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/mitchellh/go-homedir v1.0.0 // indirect
-	github.com/opsgenie/opsgenie-go-sdk v0.0.0-20180619084527-6d5c78d9f21e
+	github.com/opsgenie/opsgenie-go-sdk v0.0.0-20181102130742-d57b8391ca90
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/pflag v1.0.3 // indirect
 	github.com/spf13/viper v1.2.1

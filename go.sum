@@ -23,6 +23,8 @@ github.com/mitchellh/mapstructure v1.0.0 h1:vVpGvMXJPqSDh2VYHF7gsfQj8Ncx+Xw5Y1KH
 github.com/mitchellh/mapstructure v1.0.0/go.mod h1:FVVH3fgwuzCH5S8UJGiWEs2h04kUh9fWfEaFds41c1Y=
 github.com/opsgenie/opsgenie-go-sdk v0.0.0-20180619084527-6d5c78d9f21e h1:h/sm5T+16SxtEVsYmAmhz6eYRzx1+JVUqFSaeVtCvik=
 github.com/opsgenie/opsgenie-go-sdk v0.0.0-20180619084527-6d5c78d9f21e/go.mod h1:dNDIBlBIGnkrpaLz1o4idoRV9L27SRBGd7p8PL5YDpM=
+github.com/opsgenie/opsgenie-go-sdk v0.0.0-20181102130742-d57b8391ca90 h1:3YFIoZxerB7VHdIZ3mFoQ/rnT7AIORbdCIZ/LkFZ3QA=
+github.com/opsgenie/opsgenie-go-sdk v0.0.0-20181102130742-d57b8391ca90/go.mod h1:dNDIBlBIGnkrpaLz1o4idoRV9L27SRBGd7p8PL5YDpM=
 github.com/pelletier/go-toml v1.2.0 h1:T5zMGML61Wp+FlcbWjRDT7yAxhJNAiPPLOFECq181zc=
 github.com/pelletier/go-toml v1.2.0/go.mod h1:5z9KED0ma1S8pY6P1sdut58dfprrGBbd/94hg7ilaic=
 github.com/spf13/afero v1.1.2 h1:m8/z1t7/fwjysjQRYbP0RD+bUIF/8tJwPdEZsI83ACI=

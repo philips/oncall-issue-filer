@@ -31,7 +31,7 @@ github.com/inconshreveable/mousetrap
 github.com/magiconair/properties
 # github.com/mitchellh/mapstructure v1.0.0
 github.com/mitchellh/mapstructure
-# github.com/opsgenie/opsgenie-go-sdk v0.0.0-20180619084527-6d5c78d9f21e
+# github.com/opsgenie/opsgenie-go-sdk v0.0.0-20181102130742-d57b8391ca90
 github.com/opsgenie/opsgenie-go-sdk/alertsv2
 github.com/opsgenie/opsgenie-go-sdk/client
 github.com/opsgenie/opsgenie-go-sdk/userv2
@@ -42,6 +42,7 @@ github.com/opsgenie/opsgenie-go-sdk/escalation
 github.com/opsgenie/opsgenie-go-sdk/heartbeat
 github.com/opsgenie/opsgenie-go-sdk/integration
 github.com/opsgenie/opsgenie-go-sdk/logging
+github.com/opsgenie/opsgenie-go-sdk/logs
 github.com/opsgenie/opsgenie-go-sdk/notificationv2
 github.com/opsgenie/opsgenie-go-sdk/policy
 github.com/opsgenie/opsgenie-go-sdk/schedule
